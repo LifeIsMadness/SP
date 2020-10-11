@@ -129,7 +129,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         hListBox2,
         hButtonAdd, 
         hButtonClear,
-        hButtonRight;
+        hButtonRight,
+        hButtonDelete;
 
     switch (message)
     {
@@ -180,7 +181,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             hWnd, (HMENU)ID_BTN_RIGHT, hInst, nullptr
         );
 
-        hButtonRight = CreateWindow(
+        hButtonDelete = CreateWindow(
             L"BUTTON",
             L"Delete",
             WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
