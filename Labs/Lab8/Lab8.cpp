@@ -1,7 +1,7 @@
 #include "Lab8.h"
 
 #define ID_BTN_DRAW      1
-#define ID_BTN_CLEAR    2
+#define ID_BTN_CLEAR     2
 
 // Global Variables:
 HINSTANCE hInst;
@@ -9,7 +9,13 @@ HINSTANCE hInst;
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
-void DrawLines(const HWND& hWnd);
+void DrawChords(const HDC& hdc);
+void DrawRoundRects(const HDC& hdc);
+void DrawEllipses(const HDC& hdc);
+void DrawRectangles(const HDC& hdc);
+void DrawLines(HDC hdc);
+void DeletePen(const HDC& hdc, const HPEN& hOldPen, const HPEN& hGreenPen);
+void CreatePen(HPEN& hGreenPen, HPEN& hOldPen, const HDC& hdc);
 void DrawButton(LPDRAWITEMSTRUCT);
 void DrawBitmap(HDC hDC, int x, int y, HBITMAP hBitmap);
 
@@ -156,7 +162,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
            
         case ID_BTN_DRAW:
         {
-            DrawLines(hWnd);
+            HDC hdc = GetDC(hWnd);
+
+            DrawLines(hdc);
+            DrawRectangles(hdc);
+            DrawEllipses(hdc);
+            DrawRoundRects(hdc);
+            DrawChords(hdc);
+
+            ReleaseDC(hWnd, hdc);
         }
         break;
         case ID_BTN_CLEAR:
@@ -193,12 +207,80 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-void DrawLines(const HWND& hWnd)
+void DrawChords(const HDC& hdc)
 {
-    HDC hdc = GetDC(hWnd);
+    Chord(hdc, 50, 440, 250, 600, 50, 460, 250, 460);
+
+    HPEN hGreenPen, hOldPen;
+    CreatePen(hGreenPen, hOldPen, hdc);
+
+    Chord(hdc, 300, 440, 500, 600, 300, 460, 500, 460);
+
+    DeletePen(hdc, hOldPen, hGreenPen);
+}
+
+void DrawRoundRects(const HDC& hdc)
+{
+    RoundRect(hdc, 50, 320, 250, 450, 30, 35);
+
+    HPEN hGreenPen, hOldPen;
+    CreatePen(hGreenPen, hOldPen, hdc);
+
+    RoundRect(hdc, 300, 320, 500, 450, 30, 35);
+
+    DeletePen(hdc, hOldPen, hGreenPen);
+}
+
+void DrawEllipses(const HDC& hdc)
+{
+    Ellipse(hdc, 50, 210, 150, 310);
+
+    HPEN hGreenPen, hOldPen;
+    CreatePen(hGreenPen, hOldPen, hdc);
+
+    Ellipse(hdc, 300, 210, 400, 310);
+
+    DeletePen(hdc, hOldPen, hGreenPen);
+}
+
+void DrawRectangles(const HDC& hdc)
+{
+    Rectangle(hdc, 50, 70, 250, 200);
+
+    HPEN hGreenPen, hOldPen; 
+    CreatePen(hGreenPen, hOldPen, hdc);
+
+    Rectangle(hdc, 300, 70, 500, 200);
+
+    DeletePen(hdc, hOldPen, hGreenPen);
+
+}
+
+void DrawLines(HDC hdc)
+{
+
     MoveToEx(hdc, 50, 50, NULL);
     LineTo(hdc, 250, 50);
-    ReleaseDC(hWnd, hdc);
+
+    HPEN hGreenPen, hOldPen;
+    CreatePen(hGreenPen, hOldPen, hdc);
+
+    MoveToEx(hdc, 300, 50, NULL);
+    LineTo(hdc, 500, 50);
+
+    DeletePen(hdc, hOldPen, hGreenPen);
+}
+
+void DeletePen(const HDC& hdc, const HPEN& hOldPen, const HPEN& hGreenPen)
+{
+    SelectObject(hdc, hOldPen);
+    DeleteObject(hGreenPen);
+}
+
+void CreatePen(HPEN& hPen, HPEN& hOldPen, const HDC& hdc)
+{
+    hPen = CreatePen(PS_SOLID, 10, RGB(0, 255, 0));
+    hOldPen = (HPEN)SelectObject(hdc, hPen);
 }
 
 void DrawButton(LPDRAWITEMSTRUCT lpInfo)
